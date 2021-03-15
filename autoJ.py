@@ -1,10 +1,10 @@
 # @ File(label='Choose a directory', style='directory') import_dir
 # @ String(label='File types', value='tif;png') file_types
-# @ String(label='Filter for measure', value='GFP') filters_measure
-# @ String(label='Filter for original_handle', value='GFP') filters_original
-# @ Boolean(label='Recursive search', value=True) do_recursive
-# @ Integer(label='Measurements', value=2) measurements
-# @ Boolean(label='Export Measurements', value=True) do_export
+# @ String(label='Filter Images', value='GFP') filters_measure
+# @ String(label='Filter Originals', value='GFP') filters_original
+# @ Boolean(label='allow Originals', value=True) allow_orig
+# @ Integer(label='Measurements / Image', value=2) measurements
+# @ Boolean(label='Export Results', value=True) do_export
 
 """A batch based opener for ROI measurement in a series of images
 
@@ -115,9 +115,7 @@ https://imagej.net/Jython_Scripting
 TODO:
 	- add csv export via results:
 	https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/#measurements-results-table
-	- if no orginal filter or checkbox is checked, dont use orignal opener!
-	- replace batch opening with iteration based image opening, to reduce
-	system strain
+
 
 """
 
@@ -134,8 +132,9 @@ from ij import IJ, WindowManager as WM
 from ij.gui import GenericDialog, WaitForUserDialog
 
 
-def batch_open_images(path, file_type=None, name_filter=None, recursive=False):
-    """Open all files in the given folder.
+def filter_directory(path, file_type=None, name_filter=None, recursive=False):
+    """Creates a list of all criteria matching files in the given folder.
+
     :param path:        The path from were to open the images.
                         String and java.io.File are allowed.
     :param file_type:   Only accept files with the given extension
@@ -235,15 +234,7 @@ def batch_open_images(path, file_type=None, name_filter=None, recursive=False):
                     if check_filter(file_name):
                         # Add the file to the list of images to open.
                         path_to_images.append(full_path)
-    # Create the list that will be returned by this function.
-    images = []
-    for img_path in path_to_images:
-        # IJ.openImage() returns an ImagePlus object or None.
-        imp = IJ.openImage(img_path)
-        # An object equals True and None equals False.
-        if imp:
-            images.append(imp)
-    return images
+    return path_to_images
 
 
 def split_string(input_string):
@@ -288,6 +279,16 @@ def print_console_notes():
         print(o)
 
 
+def open_image(file_path):
+    # IJ.openImage() returns an ImagePlus object or None.
+    imp = IJ.openImage(file_path)
+    # An object equals True and None equals False.
+    if imp:
+        return imp
+    else:
+        return None
+
+
 class ButtonClic(ActionListener):
     """Class which unique function is to handle the button clicks
     For accessibility this class is defined in the same file. It handles the
@@ -295,79 +296,95 @@ class ButtonClic(ActionListener):
     measurement to simplify access during execution.
     """
     # init properties
+    original_path = None  # path to an image
     original_handle = None  # handle of an image
-    opened = False          # boolean allows closing of original
+    opened = False  # boolean allows closing of original
 
     def set_original(self, orig):
         # saves handle of an image instance
-        self.original_handle = orig  # to pass arguments to actionPerformed
-        self.opened = False          # to avoid closing a not show image
+        self.original_path = orig  # to pass arguments to actionPerformed
+        self.opened = False  # to avoid closing a not show image
 
     def actionPerformed(self, event):
         # onclick action, implements abstract method 'actionPerformed' from
         # 'java.awt.event.ActionListener'
+        self.original_handle = open_image(self.original_path)
+        if not self.original_handle:
+            print("Couldn't create an ImagePlus object from:",
+                  str(self.original_path))
+            return
         self.original_handle.show()  # open original image
-        self.opened = True           # if true will be closed if script advances
+        self.opened = True  # if true will be closed if script advances
 
 
 def run_script():
     # This enables us to stop the script by just calling return.
-    # Run the batch_open_images() function using the Scripting Parameters.
-    images = batch_open_images(import_dir,
-                               split_string(file_types),
-                               split_string(filters_measure),
-                               do_recursive)
+    # replace original header with constant:
+    do_recursive = True
+    # # @ Boolean(label='Recursive search', value=True) do_recursive
 
-    originals = batch_open_images(import_dir,
-                               split_string(file_types),
-                               split_string(filters_original),
-                               do_recursive)
-    if not images:
-        # exit script without matching images
-        print('No matching images could be found. Please check input arguments'
+    # Run the filter_directory() function using the Scripting Parameters.
+    path_list_images = filter_directory(import_dir,
+                                        split_string(file_types),
+                                        split_string(filters_measure),
+                                        do_recursive)
+
+    path_list_originals = filter_directory(import_dir,
+                                           split_string(file_types),
+                                           split_string(filters_original),
+                                           do_recursive)
+    if not path_list_images or not path_list_originals:
+        # exit script without matching path_list_images
+        print('No matching path_list_images could be found. Please check input arguments'
               '\nScript was cancelled.')
         return
 
     # note on runtime exit
     print_console_notes()
 
-    # generate button to show corresponding original image
-    # first generate java window frame
-    frame = JFrame("Open Original Image", visible=True)
-    frame.setSize(500, 125)
-    # create button and onclick event s.a.
-    button = JButton("Open Original")
-    button_event = ButtonClic()
-    button.addActionListener(button_event)
-    # We associate the button objects to some instance of the ButtonClic class
-    frame.getContentPane().add(button)
-    frame.pack()
+    if allow_orig:
+        # generate button to show corresponding original_path image_path
+        # first generate java window frame
+        frame = JFrame("Open Original Image", visible=True)
+        frame.setSize(500, 125)
+        # create button and onclick event s.a.
+        button = JButton("Open Original")
+        button_event = ButtonClic()
+        button.addActionListener(button_event)
+        # We associate the button objects to some instance of the ButtonClic class
+        frame.getContentPane().add(button)
+        frame.pack()
 
-    # looping through matching images
-    for image, original in zip(images, originals):
-        # IJ.log(str(image )) # to log file names
-        # open method used to open different extension image file
+    # looping through matching path_list_images
+    for image_path, original_path in zip(path_list_images, path_list_originals):
+        # IJ.log(str(image_path )) # to log file names
+        # open method used to open different extension image_path file
+        image = open_image(image_path)
+        if not image:
+            print("Couldn't create an ImagePlus object from:", str(image_path))
+            return
         image.show()
-        print(WM.getIDList())
-        # set name of original image in instance of action listener
-        button_event.set_original(original)
+        # set name of original_path image_path in instance of action listener
+        if allow_orig:
+            button_event.set_original(original_path)
         # calls measure function and logs results
-        # by adjusting the inner loop, more measurements per image are possible
+        # by adjusting the inner loop, more measurements per image_path are possible
         for i in range(measurements):
-            # measure ROIs per image
+            # measure ROIs per image_path
             measure_block()
-        # close image after n measurements
+        # close image_path after n measurements
         image.close()
-        if button_event.opened:
+        if allow_orig and button_event.opened:
             button_event.original_handle.close()
 
     # post processing:
     if do_export:
         print("here comes the export")
     # close java window and end script with console message
-    frame.dispose()
-    print("\n...finished autoJ.py")
+    if allow_orig:
+        frame.dispose()
 
 
 if __name__ in ['__builtin__', '__main__']:
     run_script()
+    print("\n...finished autoJ.py")
