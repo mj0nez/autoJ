@@ -1,7 +1,7 @@
 # @ File(label='Choose a directory', style='directory') import_dir
 # @ String(label='File types', value='tif;png') file_types
 # @ String(label='Filter for measure', value='GFP') filters_measure
-# @ String(label='Filter for prop', value='GFP') filters_original
+# @ String(label='Filter for original_handle', value='GFP') filters_original
 # @ Boolean(label='Recursive search', value=True) do_recursive
 # @ Integer(label='Measurements', value=2) measurements
 # @ Boolean(label='Export Measurements', value=True) do_export
@@ -62,6 +62,14 @@ image.
     been selected (ROI is the whole image).
     To open a new image, advance mit OK till it's shown.
     For further study, skipped images can be found in the console output.
+If a measurement failed and the image ist still open:
+    Just delete the measurement from the results window, select a new ROI and
+    MANUALLY measure with the dialog option ANALYZE > MEASURE or press CTRL + M.
+    This procedure has has no effect on the script execution but allows
+    corrections.
+    If the last measurement failed and the script already proceeded, note the
+    image number, delete the values from your results and repeat the
+    measurements after the run.
 
 - RESULTS
 The results of all measurements can be found in the ImageJ results
@@ -107,8 +115,9 @@ https://imagej.net/Jython_Scripting
 TODO:
 	- add csv export via results:
 	https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/#measurements-results-table
-	- open corresponding prop via button, for further analysis of very
-	    close cells
+	- if no orginal filter or checkbox is checked, dont use orignal opener!
+	- replace batch opening with iteration based image opening, to reduce
+	system strain
 
 """
 
@@ -285,15 +294,20 @@ class ButtonClic(ActionListener):
     onclick event of a simple java window, to open the original image of a
     measurement to simplify access during execution.
     """
-    prop = None  # init property
-
-    def actionPerformed(self, event):
-        # implement abstract method 'actionPerformed' from
-        # 'java.awt.event.ActionListener'
-        print(self, self.prop)
+    # init properties
+    original_handle = None  # handle of an image
+    opened = False          # boolean allows closing of original
 
     def set_original(self, orig):
-        self.prop = orig
+        # saves handle of an image instance
+        self.original_handle = orig  # to pass arguments to actionPerformed
+        self.opened = False          # to avoid closing a not show image
+
+    def actionPerformed(self, event):
+        # onclick action, implements abstract method 'actionPerformed' from
+        # 'java.awt.event.ActionListener'
+        self.original_handle.show()  # open original image
+        self.opened = True           # if true will be closed if script advances
 
 
 def run_script():
@@ -330,11 +344,13 @@ def run_script():
     frame.pack()
 
     # looping through matching images
-    for idx, image in enumerate(images):
+    for image, original in zip(images, originals):
         # IJ.log(str(image )) # to log file names
         # open method used to open different extension image file
         image.show()
-        button_event.set_original(idx)
+        print(WM.getIDList())
+        # set name of original image in instance of action listener
+        button_event.set_original(original)
         # calls measure function and logs results
         # by adjusting the inner loop, more measurements per image are possible
         for i in range(measurements):
@@ -342,6 +358,8 @@ def run_script():
             measure_block()
         # close image after n measurements
         image.close()
+        if button_event.opened:
+            button_event.original_handle.close()
 
     # post processing:
     if do_export:
