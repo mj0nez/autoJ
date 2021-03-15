@@ -7,21 +7,65 @@
 
 '''A batch based opener for ROI measurement in a series of images
 
-On start the user is asked for a directory containing the image series, as well
+On start the user is asked for a directory containing the image series as well
 as optional arguments like file types or key words for filtering. After that
 the first image is opened and a ROI has to be selected before the measurement
 is taken via a user dialog. This process is repeated for n measurements,
-defined in the first dialog window and all filtered images. All images are 
-automatically opened and closed.
+defined in the first dialog window and all filter matching images.
 
 ---
-Requirements:
+REQUIREMENTS:
 	ImageJ 1.39r or later, see:
 	https://imagejdocu.tudor.lu/plugin/utilities/wait_for_user/start#usage_in_a_plugin
+
 ---
-Resources:
-	This script is mainly based on the template 'Wiki_Jython_Tutorial_3.py' and the below
-	mentioned resources.
+USAGE:
+    - EXECUTION
+    Open Fiji / ImageJ , then open this file in the onboard Script Editor via
+    dialog option FILE > OPEN... or by pressing CTRL + O.
+    Now RUN the script and the first dialog window will open.
+    During a run, the kill option is blocked due the gui elements.
+        To end the script execution click OK and then hold ESC to manually exit.
+
+    - DIALOG OPTIONS
+    Paste a path to a directory with an image series or browse for your data.
+    By default the last path and user inputs are shown. To modify this
+    behaviour replace the header with global constants e.g.:
+        # @ String(label='File types', value='tif;png') file_types
+        file_types = 'tif;png'
+    To filter your files and measure only specific images of your directory add
+    search keys (based on the images file name) as optional argument. For more
+    than one key use ; as separator (s.a.).
+    By default this script takes two measurements per image. Users may take more
+    values by adjusting this dialog option.
+    The export checkbox is implemented for further development...
+    By pressing ok the script searches for matching images and starts the
+    procedure.
+
+    - MEASUREMENT
+    On start the script opens the first image and a dialog option. Later is
+    used to take a measurement and advance. This script uses simple ui
+    settings, therefore users may arrange windows first.
+        Note, that windows always open on the same monitor as ImageJ. After
+        arranging the gui layout, it will maintain over different executions.
+    Before proceeding by clicking OK, select a region of interest (ROI) to
+    measure. The script asks for n measurements before proceeding to the next
+    image.
+        If the image has no sufficient data, close it BEFORE advancing by
+        pressing OK. Otherwise a measurement is taken even though no ROI has
+        been selected (ROI is the whole image).
+        To open a new image, advance mit OK till it's shown.
+        For further study, skipped images can be found in the console output.
+
+    - RESULTS
+    The results of all measurements can be found in the ImageJ results
+    window. Users may export all values as a csv file.
+    An automatically export function is planned for further releases.
+
+---
+RESOURCES:
+	This script is mainly based on the template 'Wiki_Jython_Tutorial_3.py'
+	and the below mentioned resources.
 
 	imagej doc:		
 	https://imagej.nih.gov/ij/developer/api/overview-summary.html	
@@ -35,7 +79,8 @@ Resources:
 
 TODO:
 	- add csv export via results: https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/#measurements-results-table
-	- open corresponding original via button, for very close cells
+	- open corresponding original via button, for further analysis of very
+	    close cells
 '''
 
 # We do only include the module os,
@@ -179,16 +224,23 @@ def measureBlock():
     if img:
         IJ.run(img, "Measure", "")
     else:
-        print('Skipped image:', image_name)
+        print('Skipped image:')
+        print(image_name)
 
 
 def printConsoleNotes():
-    # display console outputs to user
-    line = "_________________________________________________________________________________________________________________"
+    # display notes on usage to console
+    line = "________________________________________________________________" \
+           "_________________________________________________ "
     greet = "PLEASE NOTE:"
-    execution = "\n-> Execution Kill is blocked. Hold ESC to manually exit scritp...  <-"
-    skip_img = "\nIf you wish to skip an image just close it and proceed with 'OK' to the next one.\nIn this case no measurement is taken. If you proceed without closing, the whole image is measured."
-    back_to_img = "\nIn case you wish to return to it later:\nCopy the file name from the console, rerun the script and paste it into the filter dialoge."
+    execution = "\n-> Execution Kill is blocked. Click OK and then Hold ESC " \
+                "to manually exit script...  <-"
+    skip_img = "\nIf you wish to skip an image just close it and proceed with" \
+               " 'OK' to the next one.\nIn this case no measurement is taken." \
+               " If you proceed without closing, the whole image is measured. "
+    back_to_img = "\nIn case you wish to return to it later:\nCopy the file " \
+                  "name from the console, rerun the script and paste it into " \
+                  "the filter dialog. "
     outputs = [line, greet, execution, skip_img, back_to_img, line]
     for o in outputs:
         print(o)
@@ -202,8 +254,9 @@ if __name__ in ['__builtin__', '__main__']:
                                do_recursive)
     # note on runtime exit
     printConsoleNotes()
+
+    # looping through matching images
     for image in images:
-        # Call the toString() method of each ImagePlus object.
         # IJ.log(str(image )) # to log file names
         # open method used to open different extension image file
         image.show()
@@ -212,8 +265,9 @@ if __name__ in ['__builtin__', '__main__']:
         for i in range(measurements):
             # measure ROIs per image
             measureBlock()
+        # close image after n measurements
         image.close()
     if do_export:
         print("here comes the export")
 
-    print("...finished autoJ.py")
+    print("\n...finished autoJ.py")
