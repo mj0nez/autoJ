@@ -23,7 +23,7 @@ button_event = ButtonClic()
 button_event.set_original(645665)
 
 button.addActionListener(button_event)
-# We associate the button objects to some instance of the ButtonClic class
+# We associate the button objects to some instance of the ButtonClick class
 frame.getContentPane().add(button)
 frame.pack()
 #frame.showDialog()

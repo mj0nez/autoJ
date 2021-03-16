@@ -127,17 +127,12 @@ Fur further information on Jython packaging see:
 https://imagej.net/Jython_Scripting
 
 ----------
-
-TODO:
-	- add csv export via results:
-	https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/#measurements-results-table
-
-
 """
 
-# We do only include the module os,
-# as we can use os.path.walk()
-# to access functions of the submodule.
+# TODO:
+#  - add csv export via results:
+#  https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/#measurements-results-table
+
 import os
 # java imports
 from java.io import File
@@ -305,11 +300,11 @@ def open_image(file_path):
         return None
 
 
-class ButtonClic(ActionListener):
+class ButtonClick(ActionListener):
     """Class which unique function is to handle the button clicks
     For accessibility this class is defined in the same file. It handles the
     onclick event of a simple java window, to open the original image of a
-    measurement to simplify access during execution.
+    preprocessed image to simplify access during execution.
     """
     # init properties
     original_path = None  # path to an image
@@ -365,9 +360,9 @@ def run_script():
         frame.setSize(500, 125)
         # create button and onclick event s.a.
         button = JButton("Open Original")
-        button_event = ButtonClic()
+        button_event = ButtonClick()
         button.addActionListener(button_event)
-        # We associate the button objects to some instance of the ButtonClic class
+        # We associate the button objects to some instance of the ButtonClick class
         frame.getContentPane().add(button)
         frame.pack()
 
