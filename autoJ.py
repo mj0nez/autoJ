@@ -4,10 +4,11 @@
 # @ String(label='Filter Originals', value='GFP') filters_original
 # @ Boolean(label='allow Originals', value=True) allow_orig
 # @ Integer(label='Measurements / Image', value=2) measurements
-# @ Boolean(label='Export Results', value=True) do_export
+# @ Boolean(label='Export Results', value=False) do_export
 
-"""A batch based opener for ROI measurement in a series of images
+"""auotJ - ROI measurement in an image set
 
+Jython implementation for Fiji / ImageJ.
 On start the user is asked for a directory containing the image series as well
 as optional arguments like file types or key words for filtering. After that
 the first image is opened and a ROI has to be selected before the measurement
@@ -20,6 +21,21 @@ REQUIREMENTS:
 
 ImageJ 1.39r or later, because of the dependency of built-in WaitForUserDialog:
 https://imagejdocu.tudor.lu/plugin/utilities/wait_for_user/start#usage_in_a_plugin
+
+Other dependencies weren't tested. The development was done with ImageJ
+1.53c. It's recommended to use the same or a newer release, although the
+latter may need adjustment in the future.
+
+- FILE NAMES
+To measure something on each image of a set, the file names should follow a
+ascending naming scheme and / or be composed of a prefix and some additional
+information. Alternatively delete all keywords in the filter input and the
+script works on all files in the selected folder.
+
+If you want to measure preprocessed images and sometimes need to view the
+original, check 'allow Originals'. Then the script requires an original for
+every image to measure. To avoid errors follow the above mentioned naming
+scheme and use different prefix for images to measure and compare (originals).
 
 ----------
 
