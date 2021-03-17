@@ -110,6 +110,8 @@ but offers an automatically relevance control. Therefore development may be
 done in your favourite IDE with execution in ImageJ, after reloading the latest
 script version.
 
+
+
 ----------
 """
 
