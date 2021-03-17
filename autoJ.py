@@ -448,4 +448,4 @@ if __name__ in ['__builtin__', '__main__']:
     if val:
         print('\n...finished autoJ.')
     else:
-        print('\n...Script was cancelled.')
+        print('\n...script was cancelled.')
