@@ -277,8 +277,10 @@ def measure_block(measure_i):
     if WM.getCurrentImage():
         # only if image is open
         IJ.run(img_ref, "Measure", "")
-    else:
+    elif img_ref:
         print('Skipped measure %s of: %s' % (str(measure_i+1), img_ref))
+    else:
+        print('Skipped measure %s of: s.a.' % str(measure_i + 1))
 
 
 def open_image(file_path):
@@ -298,9 +300,9 @@ class ButtonClick(ActionListener):
     preprocessed image to simplify access during execution.
     """
     # init properties
-    original_path = None  # path to an image
+    original_path   = None  # path to an image
     original_handle = None  # handle of an image
-    opened = False  # boolean allows closing of original
+    opened          = False  # boolean allows closing of original
 
     def set_original(self, orig):
         """saves handle of an image instance
@@ -404,9 +406,7 @@ def run_script():
         frame.getContentPane().add(button)
         frame.pack()
     else:
-        # to avoid referencing path_list_originals before assignment
-        # if no originals are wanted, original_path is not called,
-        # hence variable has no effect but simplifies selection handling
+        # has no effect but to avoid referencing before assignment
         path_list_originals = path_list_images
 
     print_console_notes()
