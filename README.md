@@ -1,11 +1,11 @@
 # auotJ - ROI measurement in an image set
 
-Jython implementation for Fiji / ImageJ.
 On start the user is asked for a directory containing the image series as well
 as optional arguments like file types or key words for filtering. After that
 the first image is opened and a ROI has to be selected before the measurement
 is taken via a user dialog. This process is repeated for n measurements,
 defined in the first dialog window and all filter matching images.
+Jython implementation for Fiji / ImageJ.
 
 ----------
 
@@ -26,9 +26,10 @@ information. Alternatively delete all keywords in the filter input and the
 script works on all files in the selected folder.
 
 If you want to measure preprocessed images and sometimes need to view the
-original, check 'allow Originals'. Then the script requires an original for
-every image to measure. To avoid errors follow the above mentioned naming
-scheme and use different prefix for images to measure and compare (originals).
+original, check 'allow Originals'. Then an original is required for every
+image in the directory. To avoid errors follow the above mentioned naming
+scheme and use different prefix for images to measure and to compare
+(originals).
 
 ----------
 
@@ -108,6 +109,13 @@ https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/
 
 **AUTHORS COMMENT:**
 
+Compared with the normal packing and import of python modules, the import of
+self written Jython modules is a bit more complex. To keep it simple this
+script consists of only one module and doesn't need any further
+installations. Simply open and run the file with ImageJ.
+Fur further information on Jython packaging see:
+https://imagej.net/Jython_Scripting
+
 During development dent mistakes have shown to be the greatest cause of
 errors. Therefore check dents containing a combination of spaces and tabs and
 unify the indent of error lines.
@@ -115,11 +123,5 @@ The onboard script editor of ImageJ is a rudimentary development environment,
 but offers an automatically relevance control. Therefore development may be
 done in your favourite IDE with execution in ImageJ, after reloading the latest
 script version.
-Compared with the normal packing and import of python modules, the import of
-self written Jython modules is a bit more complex. To keep it simple this
-script consists of only one module and doesn't need any further
-installations. Simply open and run the file with ImageJ.
-Fur further information on Jython packaging see:
-https://imagej.net/Jython_Scripting
 
 ----------

@@ -8,12 +8,12 @@
 
 """auotJ - ROI measurement in an image set
 
-Jython implementation for Fiji / ImageJ.
 On start the user is asked for a directory containing the image series as well
 as optional arguments like file types or key words for filtering. After that
 the first image is opened and a ROI has to be selected before the measurement
 is taken via a user dialog. This process is repeated for n measurements,
 defined in the first dialog window and all filter matching images.
+Jython implementation for Fiji / ImageJ.
 
 ----------
 
@@ -93,23 +93,14 @@ An automatically export function is planned for further releases.
 
 ----------
 
-RESOURCES:
-
-This script is mainly based on the template 'Wiki_Jython_Tutorial_3.py'
-and the below mentioned resources.
-
-imagej doc:
-https://imagej.nih.gov/ij/developer/api/overview-summary.html
-
-imagej macro language:
-https://imagej.nih.gov/ij/developer/macro/macros.html
-
-Fiji Scripting Tutorial:
-https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/
-
-----------
-
 AUTHORS COMMENT:
+
+Compared with the normal packing and import of python modules, the import of
+self written Jython modules is a bit more complex. To keep it simple this
+script consists of only one module and doesn't need any further
+installations. Simply open and run the file with ImageJ.
+Fur further information on Jython packaging see:
+https://imagej.net/Jython_Scripting
 
 During development dent mistakes have shown to be the greatest cause of
 errors. Therefore check dents containing a combination of spaces and tabs and
@@ -118,12 +109,6 @@ The onboard script editor of ImageJ is a rudimentary development environment,
 but offers an automatically relevance control. Therefore development may be
 done in your favourite IDE with execution in ImageJ, after reloading the latest
 script version.
-Compared with the normal packing and import of python modules, the import of
-self written Jython modules is a bit more complex. To keep it simple this
-script consists of only one module and doesn't need any further
-installations. Simply open and run the file with ImageJ.
-Fur further information on Jython packaging see:
-https://imagej.net/Jython_Scripting
 
 ----------
 """
