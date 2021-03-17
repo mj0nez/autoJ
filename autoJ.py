@@ -21,10 +21,9 @@ REQUIREMENTS:
 
 ImageJ 1.39r or later, because of the dependency of built-in WaitForUserDialog:
 https://imagejdocu.tudor.lu/plugin/utilities/wait_for_user/start#usage_in_a_plugin
-
 Other dependencies weren't tested. The development was done with ImageJ
 1.53c. It's recommended to use the same or a newer release, although the
-latter may need adjustment in the future.
+latter may need adjustments in the future.
 
 - FILE NAMES
 To measure something on each image of a set, the file names should follow a

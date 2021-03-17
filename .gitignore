@@ -1,3 +1,6 @@
+# own stuff
+parts/
+
 # Editors
 .vscode/
 .idea/
