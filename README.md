@@ -1,25 +1,15 @@
-# auotJ - ROI measurement in an image set
-Copyright (C) 2021  mj0nez<br>Licensed under [GPL-3.0 License](LICENSE.md) 
+# auotJ - ROI measurement for image sets with Fiji
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-any later version.
+A Jython based script to automate ROI measurement for a set of images with Fiji. 
+Users choose a directory containing the images as well as optional arguments
+like file types or key words for filtering. After that the first image is opened
+and a the user selects a ROI to measure and the script proceeds with an user
+dialog. This process is repeated for n measurements, defined in the first
+window and all filter matching images.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see https://www.gnu.org/licenses/lgpl-3.0.
-
-On start the user is asked for a directory containing the image series as well
-as optional arguments like file types or key words for filtering. After that
-the first image is opened and a ROI has to be selected before the measurement
-is taken via a user dialog. This process is repeated for n measurements,
-defined in the first dialog window and all filter matching images.
-Jython implementation for Fiji / ImageJ.
+If you are working with preprocessed files, a further dialog option enables
+users to automatically open a corresponding original during measurements,
+presuming that both sets follow the same naming scheme. 
 
 ----------
 
@@ -64,11 +54,11 @@ Paste a path to a directory with an image series or browse for your data.
 By default the last path and user inputs are shown. To modify this
 behaviour replace the header with global constants e.g., 
 
-replace:    
+delete dialog option:    
 ```
 # @ String(label='File types', value='tif;png') file_types
 ```
-with:
+add global constant:
 ```
 file_types = 'tif;png'
 ```
@@ -86,18 +76,20 @@ procedure.
 On start the script opens the first image and a dialog option. Later is
 used to take a measurement and advance. This script uses simple ui
 settings, therefore users may arrange windows first.
-    Note, that windows always open on the same monitor as ImageJ. After
+- Note, that windows always open on the same monitor as ImageJ. After
     arranging the gui layout, it will maintain over different executions.
+
 Before proceeding by clicking OK, select a region of interest (ROI) to
 measure. The script asks for n measurements before proceeding to the next
 image.
-    If the image has no sufficient data, close it BEFORE advancing by
+- If the image has no sufficient data, close it BEFORE advancing by
     pressing OK. Otherwise a measurement is taken even though no ROI has
     been selected (ROI is the whole image).
     To open a new image, advance mit OK till it's shown.
     For further study, skipped images can be found in the console output.
+    
 If a measurement failed and the image ist still open:
-    Just delete the measurement from the results window, select a new ROI and
+- Just delete the measurement from the results window, select a new ROI and
     MANUALLY measure with the dialog option ANALYZE > MEASURE or press CTRL + M.
     This procedure has has no effect on the script execution but allows
     corrections.
@@ -109,7 +101,7 @@ If a measurement failed and the image ist still open:
 
 The results of all measurements can be found in the ImageJ results
 window. Users may export all values as a csv file.
-An automatically export function is planned for further releases.
+An automatically export function is planned for a further a release.
 
 
 
@@ -129,7 +121,7 @@ https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/
 
 ----------
 
-**AUTHORS COMMENT:**
+##Authors comment:
 
 Compared with the normal packing and import of python modules, the import of
 self written Jython modules is a bit more complex. To keep it simple this
@@ -147,3 +139,21 @@ done in your favourite IDE with execution in ImageJ, after reloading the latest
 script version.
 
 ----------
+
+## License & copyright
+
+Copyright (C) 2021  mj0nez <br>Licensed under [GPL-3.0 License
+](LICENSE.md)
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see https://www.gnu.org/licenses/lgpl-3.0.
