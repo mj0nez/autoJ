@@ -121,7 +121,7 @@ https://syn.mrc-lmb.cam.ac.uk/acardona/fiji-tutorial/
 
 ----------
 
-##Authors comment:
+## Authors comment:
 
 Compared with the normal packing and import of python modules, the import of
 self written Jython modules is a bit more complex. To keep it simple this
