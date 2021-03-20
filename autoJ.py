@@ -138,28 +138,19 @@ def filter_directory(path, file_type=None, name_filter=None):
     path = os.path.expanduser(path)
     path = os.path.expandvars(path)
 
-    # os.walk() is iterable.
     # Each iteration of the for loop processes a different directory.
-    # the first return value represents the current directory.
-    # The second return value is a list of included directories.
-    # The third return value is a list of included files.
     for directory, dir_names, file_names in os.walk(path):
         # We are only interested in files.
         for file_name in file_names:
-            # The list contains only the file names.
-            # The full path needs to be reconstructed.
-            full_path = os.path.join(directory, file_name)
-            # Both checks are performed to filter the files.
-            if check_type(file_name):
-                if check_filter(file_name):
-                    # Add the file to the list of images to open.
-                    path_to_images.append(full_path)
+            # add full path to list only for matching files
+            if check_type(file_name) and check_filter(file_name):
+                full_path = os.path.join(directory, file_name)
+                path_to_images.append(full_path)
     return path_to_images
 
 
 def split_string(input_string):
-    """Split a string to a list and strip it
-    :param input_string: A string that contains semicolons as separators.
+    """Split a string separated by ; to a list and strip it
     """
     string_splitted = input_string.split(';')
     # Remove whitespace at the beginning and end of each string
@@ -167,7 +158,7 @@ def split_string(input_string):
     return strings_striped
 
 
-def measure_block(measure_i):
+def let_user_select_ROI_and_measure(measure_i):
     # save image reference before user choice
     img_ref = WM.getCurrentImage()
 
@@ -187,8 +178,7 @@ def measure_block(measure_i):
 def open_image(file_path):
     # IJ.openImage() returns an ImagePlus object or None.
     imp = IJ.openImage(file_path)
-    # An object equals True and None equals False.
-    return imp if imp else None
+    return imp if imp else None     # an object equals true
 
 
 class ButtonClick(ActionListener):
@@ -219,8 +209,7 @@ class ButtonClick(ActionListener):
         :param event:   argument of super method
         :return:        None
         """
-        # opens only on image instance
-        if self.opened:
+        if self.opened:                 # opens only one image instance
             return
 
         self.original_handle = open_image(self.original_path)
@@ -230,7 +219,7 @@ class ButtonClick(ActionListener):
             return
 
         self.original_handle.show()
-        self.opened = True  # if opened, will be closed if script advances
+        self.opened = True              # allows closing before advancing
 
 
 def print_console_notes():
@@ -254,11 +243,7 @@ def print_console_notes():
 
 
 def print_filter_error(file_types, filters):
-    """Prints custom error massage for filter
-
-    :param file_types:  user input
-    :param filters:     user input
-    :return:
+    """Prints custom error massage for filter with user inputs
     """
     print('No matches for [%s] and [%s] in directory.'
           '\nPlease check input arguments.'
@@ -271,22 +256,18 @@ def run_script():
     :return: boolean    True if successful, False if execution failed
     """
 
-    # replaced original user dialog in header with constant:
-    do_recursive = True
-    # # @ Boolean(label='Recursive search', value=True) do_recursive
-
-    # filter directory with user inputs from dialog in file header
+    """ Filtering and creation of additional ui elements 
+    """
     path_list_images = filter_directory(import_dir,
                                         file_types,
                                         filters_measure)
-    # exit without matching images
+
     if not path_list_images:
         print_filter_error(file_types,
                            filters_measure)
-        return False
+        return False                            # exit without matching images
 
-    # do the same for originals
-    if allow_orig:
+    if allow_orig:                              # do the same for originals
         path_list_originals = filter_directory(import_dir,
                                                file_types,
                                                filters_original)
@@ -295,21 +276,22 @@ def run_script():
                                filters_original)
             return False
 
-        # Generate user dialog to allow opening of originals
-        frame = JFrame("Open Original Image",
-                       visible=True, size=(500, 125))
-        button = JButton("Open Original")
-        button_event = ButtonClick()
+        frame           = JFrame("Open Original Image",
+                                 visible=True, size=(500, 125))
+        button          = JButton("Open Original")
+        button_event    = ButtonClick()
+
         button.addActionListener(button_event)
         frame.getContentPane().add(button)
-        frame.pack()
+        frame.pack()                            # created UI elements
     else:
-        # has no effect but to avoid referencing before assignment
+        # has no effect, but avoids referencing before assignment
         path_list_originals = path_list_images
 
     print_console_notes()
 
-    # looping through matching files in path_lists
+    """ Execution loop
+    """
     for image_path, original_path in zip(path_list_images, path_list_originals):
 
         image = open_image(image_path)
@@ -319,24 +301,24 @@ def run_script():
                   % str(image_path))
             return False
 
-        image.show()    # for ROI selection
+        image.show()                                    # for ROI selection
 
         if allow_orig:
-            button_event.set_original(original_path)  # allows opening
+            button_event.set_original(original_path)    # allows opening
 
         for i in range(measurements):
-            measure_block(i)    # measure ROIs per image
+            let_user_select_ROI_and_measure(i)
 
-        # close images after measurements
-        image.close()
+        image.close()                                   # close before next
         if allow_orig and button_event.opened:
             button_event.original_handle.close()
 
-    # Post processing:
+    """ Post processing - export and UI disposal
+    """
     if do_export:
         print('here comes the export')
     if allow_orig:
-        frame.dispose()  # close additional java window
+        frame.dispose()
 
     return True
 
