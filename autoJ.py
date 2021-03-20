@@ -159,13 +159,13 @@ def split_string(input_string):
 
 
 def let_user_select_ROI_and_measure(measure_i):
-    # save image reference before user choice
-    img_ref = WM.getCurrentImage()
 
-    # plugin call holds loop until user continues
-    WaitForUserDialog("Proceed...?",
-                      "Select ROI or skip image by closing it and click"
-                      "OK'").show()
+    img_ref = WM.getCurrentImage()      # save reference before user choice
+
+    frame_title = "Proceed...?"         # plugin holds loop until on-click
+    frame_text  = "Select ROI or skip image by closing it and click OK"
+    WaitForUserDialog(frame_title, frame_text).show()
+
     if WM.getCurrentImage():
         # only if image is open
         IJ.run(img_ref, "Measure", "")
@@ -325,7 +325,8 @@ def run_script():
 
 if __name__ in ['__builtin__', '__main__']:
     val = run_script()
-    if val:
-        print('\n...finished autoJ.')
-    else:
-        print('\n...Script was cancelled.')
+
+    msg_done    = '\n...finished autoJ.'
+    msg_cancel  = '\n...Script was cancelled.'
+    msg = msg_done if val else msg_cancel
+    print(msg)
