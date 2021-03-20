@@ -1,4 +1,4 @@
-# auotJ - ROI measurement for image sets with Fiji
+# autoJ - ROI measurement for image sets with Fiji
 
 A Jython based script to automate ROI measurement for a set of images with Fiji. 
 Users choose a directory containing the images as well as optional arguments
